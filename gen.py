@@ -4,4 +4,9 @@ image_template = '<figure class="third"><img src="http://image.sinajs.cn/newchar
 with open('list.csv', 'r') as f:
     reader = csv.reader(f)    
     for row in reader:
-        print(image_template.format(row[0],row[0]))
+        code = row[0]
+        if code[0] != 's':
+            num = code.split('.')[0]
+            mkt = code.split('.')[1]
+            code = mkt.lower()+num
+        print(image_template.format(code,code))
