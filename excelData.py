@@ -1,14 +1,18 @@
 from openpyxl import Workbook
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Border, Side
 import csv
 import requests
 
+wb = Workbook()
+ws = wb.active
 
-# wb = Workbook()
-# ws = wb.active
+
 # ws.sheet_properties.tabColor = "1072BA"
 # ws['A4'] = 'hello world'
 # wb.save('balances.xlsx')
 # http://hq.sinajs.cn/list=sz002307,sh600928
+
 
 def get_request(bat_arr):
     query_string = ','.join(bat_arr)
@@ -42,5 +46,44 @@ with open('list.csv', 'r') as f:
             if len(one) > 4:
                 all_result.append(one.split('=')[1])
 
+    index = 0
     for one in all_result:
-        print(one)
+        index = index + 1
+        content_array = one.split(',')
+        name = content_array[0][1:]
+        open_price = content_array[1]
+        yesterday_close_prise = content_array[2]
+        now_price = content_array[3]
+        high_price = content_array[4]
+        low_price = content_array[5]
+        buy_1 = content_array[10]
+        sell_1 = content_array[20]
+        gap = (float(now_price) - float(yesterday_close_prise)) * 100 / float(yesterday_close_prise)
+
+        ws["A{0}".format(index)] = name
+        thin = Side(border_style="thin", color="000000")
+        ws["B{0}".format(index)].border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
+        # fill in color
+        if buy_1 == '0':
+            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="000001")
+            continue
+        if sell_1 == '0':
+            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FF0000")
+            continue
+        if now_price > yesterday_close_prise:
+            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="ec7c24")
+            if gap > 5:
+                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FF6600")
+            elif gap < 1.5:
+                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FFCC00")
+            continue
+        if now_price <= yesterday_close_prise:
+            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="6cac44")
+            if gap < -5:
+                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="003300")
+            elif gap > -1.5:
+                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="99CC00")
+            continue
+
+wb.save('balances.xlsx')
