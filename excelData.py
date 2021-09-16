@@ -3,6 +3,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.styles import Border, Side
 import csv
 import requests
+import time
 
 wb = Workbook()
 ws = wb.active
@@ -24,7 +25,11 @@ with open('list.csv', 'r') as f:
     batch_array = []
     request_array = []
     reader = csv.reader(f)
+    orign_code = []
     for row in reader:
+        if len(row) == 0:
+            continue
+        orign_code.append(row)
         code = row[0]
         num = code.split('.')[0]
         mkt = code.split('.')[1]
@@ -40,6 +45,7 @@ with open('list.csv', 'r') as f:
     all_result = []
     for request in request_array:
         print(request)
+        time.sleep(1)
         response = requests.get(request)
         ten_batch = response.text.split(';')
         for one in ten_batch:
@@ -48,6 +54,7 @@ with open('list.csv', 'r') as f:
 
     index = 0
     for one in all_result:
+        orign = orign_code[index]
         index = index + 1
         content_array = one.split(',')
         name = content_array[0][1:]
@@ -61,29 +68,30 @@ with open('list.csv', 'r') as f:
         gap = (float(now_price) - float(yesterday_close_prise)) * 100 / float(yesterday_close_prise)
 
         ws["A{0}".format(index)] = name
+        ws["B{0}".format(index)] = orign[0]
         thin = Side(border_style="thin", color="000000")
-        ws["B{0}".format(index)].border = Border(top=thin, left=thin, right=thin, bottom=thin)
+        ws["C{0}".format(index)].border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
         # fill in color
         if buy_1 == '0':
-            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="000001")
+            ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="000001")
             continue
         if sell_1 == '0':
-            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FF0000")
+            ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="FF0000")
             continue
         if now_price > yesterday_close_prise:
-            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="ec7c24")
+            ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="ec7c24")
             if gap > 5:
-                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FF6600")
+                ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="FF6600")
             elif gap < 1.5:
-                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="FFCC00")
+                ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="FFCC00")
             continue
         if now_price <= yesterday_close_prise:
-            ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="6cac44")
+            ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="6cac44")
             if gap < -5:
-                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="003300")
+                ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="003300")
             elif gap > -1.5:
-                ws["B{0}".format(index)].fill = PatternFill("solid", fgColor="99CC00")
+                ws["C{0}".format(index)].fill = PatternFill("solid", fgColor="99CC00")
             continue
 
 wb.save('balances.xlsx')
