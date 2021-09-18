@@ -4,7 +4,7 @@ import time
 import requests
 from openpyxl.styles.builtins import styles
 
-url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210910&end=20210916&fields=PCHG'
+url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210901&end=20210917&fields=PCHG'
 
 import csv
 import os
@@ -65,7 +65,6 @@ def gen_excel(data_bag):
         ws.cell(cell_row_index, 1, data.code)
         ws.cell(cell_row_index, 2, data.name)
         thin = Side(border_style="thin", color="000000")
-        print(data)
         for i in range(lendays):
             va = data.each_day_change[lendays-i-1]
             c = ws.cell(cell_row_index, 3 + i, str(va))
@@ -119,11 +118,10 @@ if __name__ == '__main__':
             s.add_Day(row[0])
             s.name = row[2]
             s.code = all_codes[index][0]
-            print(row)
         data_bag.append(s)
         f_local.close()
         index = index + 1
-        print("processed {0}".format(index))
+        print("processed {0}, current request grab {1} rows".format(index, len(s.each_day)))
 
     gen_excel(data_bag)
     wb.save('history.xlsx')
