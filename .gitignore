@@ -2,3 +2,6 @@ venv/*
 .idea/*
 store/*
 balances.xlsx
+.DS_Store
+.vscode/*
+automac/*
