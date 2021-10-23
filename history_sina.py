@@ -1,3 +1,4 @@
+import csv
 import json
 import time
 
@@ -6,8 +7,6 @@ import requests
 day = '2021-09-08'
 url_format = 'http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={0}' \
              '&scale=60&ma=no&datalen=20'
-
-import csv
 
 
 def gen_meta():

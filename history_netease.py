@@ -1,17 +1,17 @@
+from openpyxl.styles import Border, Side
+from openpyxl.styles import PatternFill
+from openpyxl import Workbook
+from io import StringIO
+import os
+import csv
 import json
 import time
 
 import requests
 from openpyxl.styles.builtins import styles
 
-url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210901&end=20210924&fields=PCHG'
+url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210901&end=20211030&fields=PCHG'
 
-import csv
-import os
-from io import StringIO
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill
-from openpyxl.styles import Border, Side
 
 wb = Workbook()
 ws = wb.active
@@ -69,7 +69,7 @@ def gen_excel(data_bag):
             va = data.each_day_change[lendays-i-1]
             c = ws.cell(cell_row_index, 3 + i, str(va))
             c.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-            if va =='None':
+            if va == 'None':
                 va = 0
             va = float(va)
             if va < -9:
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             for line in csv_reader:
                 csv_writer.writerow(line)
             f_local.close()
-            time.sleep(1)
+            time.sleep(0.1)
 
         f_local = open('./store/{0}'.format(filename), 'r')
         reader = csv.reader(f_local, delimiter=',')
@@ -121,7 +121,8 @@ if __name__ == '__main__':
         data_bag.append(s)
         f_local.close()
         index = index + 1
-        print("processed {0}, current request grab {1} rows".format(index, len(s.each_day)))
+        print("processed {0}, current request grab {1} rows".format(
+            index, len(s.each_day)))
 
     gen_excel(data_bag)
     wb.save('history.xlsx')
