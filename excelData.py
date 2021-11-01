@@ -69,6 +69,7 @@ with open('list.csv', 'r') as f:
 
         ws["A{0}".format(index)] = name
         ws["B{0}".format(index)] = orign[0]
+        ws["C{0}".format(index)] = gap
         thin = Side(border_style="thin", color="000000")
         ws["C{0}".format(index)].border = Border(top=thin, left=thin, right=thin, bottom=thin)
 

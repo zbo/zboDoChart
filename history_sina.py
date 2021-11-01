@@ -1,13 +1,18 @@
 import csv
 import json
 import time
-
 import requests
 
-day = '2021-09-08'
+
 url_format = 'http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={0}' \
              '&scale=60&ma=no&datalen=20'
 
+class Stock:
+    def __init__(self):
+        self.each_day_change = []
+        self.each_day = []
+        self.name = ''
+        self.code = ''
 
 def gen_meta():
     with open('list.csv', 'r') as f:
@@ -29,7 +34,7 @@ def a_print(array):
         print(i)
 
 
-def get_change(json_in, day):
+def get_change(json_in):
     json_object = json.loads(json_in)
     # print(json_object)
     last_mins = []
@@ -47,14 +52,32 @@ def get_change(json_in, day):
     return all_changes
 
 
+def fileExist(filename):
+    import os
+    if os.path.exists('./sina/{0}'.format(filename)):
+        return True
+    return False
+
+
 if __name__ == '__main__':
     all_urls, all_codes = gen_meta()
     array_len = range(len(all_urls))
+    all_changes = []
     for i in array_len:
         u = all_urls[i]
         c = all_codes[i]
-        response = requests.get(u)
-        print(u)
-        time.sleep(1)
-        change = get_change(response.text, day)
-        print(change)
+        filename = c[0] + '.json'
+        if not fileExist(filename):
+            print('Number: {0} '.format(i) + 'web-fetch {0}'.format(u))
+            response = requests.get(u)
+            f_local = open('./sina/{0}'.format(filename), 'w')
+            f_local.writelines(response.text)
+            time.sleep(1)
+            f_local.close()
+        else:
+            print('hit local')
+        f_local = open('./sina/{0}'.format(filename), 'r')
+        content = f_local.readlines()[0]
+        change = get_change(content)
+        all_changes.append(change)
+

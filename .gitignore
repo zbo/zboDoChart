@@ -1,6 +1,7 @@
 venv/*
 .idea/*
 store/*
+sina/*
 balances.xlsx
 .DS_Store
 .vscode/*
