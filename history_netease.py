@@ -10,7 +10,7 @@ import time
 import requests
 from openpyxl.styles.builtins import styles
 
-url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210901&end=20211130&fields=PCHG'
+url_format = 'http://quotes.money.163.com/service/chddata.html?code={0}&start=20210901&end=20211230&fields=PCHG'
 
 
 wb = Workbook()
@@ -67,7 +67,10 @@ def gen_excel(data_bag):
         thin = Side(border_style="thin", color="000000")
         for i in range(lendays):
             va = data.each_day_change[lendays-i-1]
-            c = ws.cell(cell_row_index, 3 + i, str(va))
+            filldata = str(va)
+            if str(va) == "None":
+                filldata = "停"
+            c = ws.cell(cell_row_index, 3 + i, filldata)
             c.border = Border(top=thin, left=thin, right=thin, bottom=thin)
             if va == 'None':
                 va = 0
